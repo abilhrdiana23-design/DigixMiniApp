@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DIGIXSHOP - Telegram Mini App</title>
+  
+  <!-- Telegram Web App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            cyber: {
+              bg: '#08070e',
+              card: '#120f24',
+              surface: '#1b1735',
+              border: '#2a2450',
+              accent: '#8b5cf6',
+              neon: '#a855f7',
+              emerald: '#10b981',
+              cyan: '#06b6d4',
+              pink: '#ec4899',
+              amber: '#f59e0b'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['Fira Code', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap');
+
+    ::-webkit-scrollbar { width: 0px; }
+    * { -webkit-tap-highlight-color: transparent; }
+
+    .glass-card {
+      background: rgba(18, 15, 36, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    .glass-nav {
+      background: rgba(8, 7, 14, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    @keyframes jet-hover {
+      0%, 100% { transform: translateY(0) rotate(-45deg); filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.6)); }
+      50% { transform: translateY(-10px) rotate(-43deg); filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.9)); }
+    }
+    .animate-jet { animation: jet-hover 2.5s ease-in-out infinite; }
+
+    @keyframes thruster {
+      0%, 100% { opacity: 0.4; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+    .animate-thruster { animation: thruster 0.2s ease-in-out infinite alternate; }
+
+    .glow-header {
+      box-shadow: 0 0 20px -5px rgba(139, 92, 246, 0.3);
+    }
+  </style>
+</head>
+<body class="bg-cyber-bg text-gray-100 font-sans antialiased min-h-screen pb-28 selection:bg-cyber-accent selection:text-white overflow-x-hidden">
+
+  <!-- LOADING SCREEN -->
+  <div id="loading-screen" class="fixed inset-0 z-50 bg-cyber-bg flex flex-col items-center justify-center transition-opacity duration-700">
+    <div class="relative flex items-center justify-center mb-8">
+      <div class="absolute w-36 h-36 border-2 border-dashed border-cyber-neon/40 rounded-full animate-spin" style="animation-duration: 12s;"></div>
+      <div class="absolute w-28 h-28 border border-cyber-cyan/30 rounded-full animate-ping opacity-30"></div>
+      
+      <div class="relative z-10 flex flex-col items-center">
+        <i data-lucide="plane" class="w-16 h-16 text-cyber-neon animate-jet"></i>
+        <div class="w-4 h-8 bg-gradient-to-b from-cyber-cyan to-transparent rounded-full blur-sm animate-thruster mt-[-10px]"></div>
+      </div>
+    </div>
+
+    <h1 class="text-2xl font-black tracking-wider text-white">DIGIX<span class="text-transparent bg-clip-text bg-gradient-to-r from-cyber-neon to-cyber-cyan">SHOP</span></h1>
+    <p class="text-xs font-mono text-cyber-neon/80 mt-1 flex items-center gap-1.5">
+      <i data-lucide="cpu" class="w-3.5 h-3.5 animate-spin"></i> INITIALIZING SYSTEM...
+    </p>
+
+    <div class="w-48 h-1 bg-cyber-card rounded-full mt-4 overflow-hidden border border-cyber-border/40">
+      <div id="loading-bar" class="h-full bg-gradient-to-r from-cyber-accent via-cyber-cyan to-cyber-neon w-0 transition-all duration-1000 ease-out"></div>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <div id="app" class="hidden max-w-md mx-auto px-4 pt-4">
+
+    <!-- HEADER / PROFILE -->
+    <header class="glass-card p-3.5 rounded-2xl mb-4 flex items-center justify-between relative overflow-hidden glow-header border border-cyber-neon/30">
+      <div class="absolute -right-8 -bottom-8 w-24 h-24 bg-cyber-neon/15 rounded-full blur-xl pointer-events-none"></div>
+
+      <div class="flex items-center gap-3 z-10">
+        <div class="relative">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-cyber-accent to-cyber-cyan p-0.5 shadow-lg shadow-cyber-accent/20">
+            <img id="user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Digix" class="w-full h-full rounded-[10px] bg-cyber-card object-cover" alt="Avatar">
+          </div>
+          <span class="absolute -bottom-1 -right-1 flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyber-emerald opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-cyber-emerald"></span>
+          </span>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h2 id="user-name" class="text-xs font-bold text-white leading-tight">Pengguna Telegram</h2>
+            <span class="bg-gradient-to-r from-cyber-accent to-cyber-neon text-white text-[8px] font-mono font-extrabold px-1.5 py-0.2 rounded-full shadow">PRO</span>
+          </div>
+          <p id="user-id" class="text-[10px] font-mono text-gray-400 mt-0.5">ID: 123456789</p>
+        </div>
+      </div>
+
+      <div class="text-right z-10">
+        <span class="text-[9px] uppercase font-mono text-gray-400 block tracking-wider">Saldo Utama</span>
+        <div class="flex items-center justify-end gap-1.5 mt-0.5">
+          <span id="user-balance" class="text-xs font-mono font-bold text-cyber-emerald">Rp 0</span>
+          <button onclick="openTopupModal()" class="bg-gradient-to-br from-cyber-accent to-cyber-neon hover:opacity-90 text-white p-1.5 rounded-lg shadow-md shadow-cyber-accent/30 transition transform active:scale-95">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- DASHBOARD VIEW -->
+    <section id="view-dashboard" class="space-y-4">
+      <div class="relative rounded-2xl overflow-hidden p-4 border border-cyber-neon/30 bg-gradient-to-br from-cyber-card via-cyber-surface to-cyber-bg shadow-xl">
+        <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-cyber-accent/20 rounded-full blur-2xl"></div>
+        <div class="relative z-10">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="bg-gradient-to-r from-cyber-pink to-cyber-neon text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Automated 24/7</span>
+            <span class="text-[10px] font-mono text-cyber-cyan flex items-center gap-1">
+              <i data-lucide="zap" class="w-3 h-3 text-amber-400 fill-amber-400"></i> QRIS Pakasir
+            </span>
+          </div>
+          <h3 class="text-base font-extrabold text-white tracking-wide leading-tight">Deposit & Checkout Instant</h3>
+          <p class="text-xs text-gray-300 mt-1.5">Isi saldo otomatis via QRIS Pakasir atau bayar langsung saat pembelian.</p>
+          
+          <div class="flex items-center gap-2 mt-3">
+            <button onclick="switchTab('products')" class="bg-gradient-to-r from-cyber-accent to-cyber-neon text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-lg shadow-cyber-accent/30 flex items-center gap-1">
+              Beli Produk <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+            <button onclick="openTopupModal()" class="glass-card text-cyber-emerald border border-cyber-emerald/40 text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1">
+              <i data-lucide="wallet" class="w-3.5 h-3.5"></i> Isi Saldo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="glass-card p-3 rounded-xl flex items-center gap-3 border border-cyber-border/50">
+          <div class="p-2.5 bg-cyber-neon/10 border border-cyber-neon/30 text-cyber-neon rounded-lg">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-mono text-gray-400 block uppercase">Total Transaksi</span>
+            <span class="text-xs font-bold text-white">1,420+ Selesai</span>
+          </div>
+        </div>
+        <div class="glass-card p-3 rounded-xl flex items-center gap-3 border border-cyber-border/50">
+          <div class="p-2.5 bg-cyber-emerald/10 border border-cyber-emerald/30 text-cyber-emerald rounded-lg">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-mono text-gray-400 block uppercase">Gateway Status</span>
+            <span class="text-xs font-bold text-cyber-emerald flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-cyber-emerald animate-ping"></span> QRIS Ready
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KATEGORI POPULER -->
+      <div>
+        <div class="flex items-center justify-between mb-2.5">
+          <h4 class="text-xs font-mono text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+            <i data-lucide="grid" class="w-3.5 h-3.5 text-cyber-neon"></i> Kategori Populer
+          </h4>
+          <span class="text-[10px] text-cyber-neon font-mono">Pilih Kategori</span>
+        </div>
+        
+        <div class="grid grid-cols-4 gap-2 text-center">
+          <button onclick="filterCategory('Bot VIP')" class="glass-card p-3 rounded-2xl hover:border-cyber-neon transition-all duration-300 group border border-cyber-border/60 hover:shadow-lg hover:shadow-cyber-neon/10">
+            <div class="w-10 h-10 mx-auto bg-gradient-to-br from-cyber-surface to-cyber-card border border-cyber-neon/40 rounded-xl flex items-center justify-center text-cyber-neon group-hover:scale-110 transition-transform shadow-inner">
+              <i data-lucide="bot" class="w-5 h-5"></i>
+            </div>
+            <span class="text-[10px] font-bold block mt-2 text-gray-200 group-hover:text-cyber-neon transition-colors">Bot VIP</span>
+          </button>
+
+          <button onclick="filterCategory('Source Code')" class="glass-card p-3 rounded-2xl hover:border-cyber-cyan transition-all duration-300 group border border-cyber-border/60 hover:shadow-lg hover:shadow-cyber-cyan/10">
+            <div class="w-10 h-10 mx-auto bg-gradient-to-br from-cyber-surface to-cyber-card border border-cyber-cyan/40 rounded-xl flex items-center justify-center text-cyber-cyan group-hover:scale-110 transition-transform shadow-inner">
+              <i data-lucide="code" class="w-5 h-5"></i>
+            </div>
+            <span class="text-[10px] font-bold block mt-2 text-gray-200 group-hover:text-cyber-cyan transition-colors">Source Code</span>
+          </button>
+
+          <button onclick="filterCategory('Hosting')" class="glass-card p-3 rounded-2xl hover:border-cyber-emerald transition-all duration-300 group border border-cyber-border/60 hover:shadow-lg hover:shadow-cyber-emerald/10">
+            <div class="w-10 h-10 mx-auto bg-gradient-to-br from-cyber-surface to-cyber-card border border-cyber-emerald/40 rounded-xl flex items-center justify-center text-cyber-emerald group-hover:scale-110 transition-transform shadow-inner">
+              <i data-lucide="globe" class="w-5 h-5"></i>
+            </div>
+            <span class="text-[10px] font-bold block mt-2 text-gray-200 group-hover:text-cyber-emerald transition-colors">Hosting</span>
+          </button>
+
+          <button onclick="filterCategory('Topup')" class="glass-card p-3 rounded-2xl hover:border-cyber-pink transition-all duration-300 group border border-cyber-border/60 hover:shadow-lg hover:shadow-cyber-pink/10">
+            <div class="w-10 h-10 mx-auto bg-gradient-to-br from-cyber-surface to-cyber-card border border-cyber-pink/40 rounded-xl flex items-center justify-center text-cyber-pink group-hover:scale-110 transition-transform shadow-inner">
+              <i data-lucide="gamepad-2" class="w-5 h-5"></i>
+            </div>
+            <span class="text-[10px] font-bold block mt-2 text-gray-200 group-hover:text-cyber-pink transition-colors">Game VIP</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HALAMAN PRODUK -->
+    <section id="view-products" class="hidden space-y-3">
+      <div class="relative mb-3">
+        <i data-lucide="search" class="w-4 h-4 text-cyber-neon absolute left-3.5 top-1/2 transform -translate-y-1/2"></i>
+        <input type="text" id="search-input" onkeyup="filterProducts()" placeholder="Cari layanan, bot, sc..." class="w-full bg-cyber-card border border-cyber-border/80 text-xs text-white placeholder-gray-500 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-cyber-neon transition-colors shadow-inner">
+      </div>
+
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="text-xs font-mono uppercase tracking-wider text-gray-400">Daftar Layanan Digital</h3>
+        <span onclick="resetFilter()" class="text-[10px] font-mono text-cyber-neon cursor-pointer hover:underline">Tampilkan Semua</span>
+      </div>
+
+      <div id="product-list" class="space-y-3">
+        <div class="product-item glass-card p-3.5 rounded-2xl flex items-center justify-between gap-3 border border-cyber-border/60 hover:border-cyber-neon/60 transition" data-name="Sewa Bot Telegram VIP" data-category="Bot VIP">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-cyber-surface border border-cyber-neon/30 rounded-xl flex items-center justify-center text-cyber-neon shrink-0">
+              <i data-lucide="bot" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <span class="text-[9px] font-mono bg-cyber-neon/10 text-cyber-neon border border-cyber-neon/20 px-1.5 py-0.2 rounded">Bot VIP</span>
+              <h4 class="text-xs font-bold text-white mt-0.5">Sewa Bot Premium (30 Hari)</h4>
+              <p class="text-[10px] text-gray-400">Akses fitur lengkap + Webhook Pakasir</p>
+              <span class="text-xs font-mono font-bold text-cyber-emerald mt-1 block">Rp 25.000</span>
+            </div>
+          </div>
+          <button onclick="openCheckout('Sewa Bot Premium (30 Hari)', 25000)" class="bg-gradient-to-r from-cyber-accent to-cyber-neon hover:opacity-90 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-lg shadow-cyber-accent/30 shrink-0">
+            Beli
+          </button>
+        </div>
+
+        <div class="product-item glass-card p-3.5 rounded-2xl flex items-center justify-between gap-3 border border-cyber-border/60 hover:border-cyber-cyan/60 transition" data-name="Source Code MiniApp Telegram" data-category="Source Code">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-cyber-surface border border-cyber-cyan/30 rounded-xl flex items-center justify-center text-cyber-cyan shrink-0">
+              <i data-lucide="file-code-2" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <span class="text-[9px] font-mono bg-cyber-cyan/10 text-cyber-cyan border border-cyber-cyan/20 px-1.5 py-0.2 rounded">Source Code</span>
+              <h4 class="text-xs font-bold text-white mt-0.5">SC Full MiniApp DIGIXSHOP</h4>
+              <p class="text-[10px] text-gray-400">Full source code Node.js + Frontend UI</p>
+              <span class="text-xs font-mono font-bold text-cyber-emerald mt-1 block">Rp 50.000</span>
+            </div>
+          </div>
+          <button onclick="openCheckout('SC Full MiniApp DIGIXSHOP', 50000)" class="bg-gradient-to-r from-cyber-accent to-cyber-neon hover:opacity-90 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-lg shadow-cyber-accent/30 shrink-0">
+            Beli
+          </button>
+        </div>
+
+        <div class="product-item glass-card p-3.5 rounded-2xl flex items-center justify-between gap-3 border border-cyber-border/60 hover:border-cyber-pink/60 transition" data-name="Panel Hosting Node.js / Bot" data-category="Hosting">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-cyber-surface border border-cyber-pink/30 rounded-xl flex items-center justify-center text-cyber-pink shrink-0">
+              <i data-lucide="server" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <span class="text-[9px] font-mono bg-cyber-pink/10 text-cyber-pink border border-cyber-pink/20 px-1.5 py-0.2 rounded">Hosting</span>
+              <h4 class="text-xs font-bold text-white mt-0.5">Panel Server RAM 4GB</h4>
+              <p class="text-[10px] text-gray-400">High Speed Uptime 99.9% 1 Bulan</p>
+              <span class="text-xs font-mono font-bold text-cyber-emerald mt-1 block">Rp 15.000</span>
+            </div>
+          </div>
+          <button onclick="openCheckout('Panel Server RAM 4GB', 15000)" class="bg-gradient-to-r from-cyber-accent to-cyber-neon hover:opacity-90 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-lg shadow-cyber-accent/30 shrink-0">
+            Beli
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIWAYAT ORDER -->
+    <section id="view-orders" class="hidden space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-mono uppercase tracking-wider text-gray-400">Status Transaksi Live</h3>
+        <span class="text-[10px] font-mono text-cyber-emerald flex items-center gap-1 bg-cyber-emerald/10 px-2 py-0.5 rounded border border-cyber-emerald/20">
+          <span class="w-1.5 h-1.5 rounded-full bg-cyber-emerald animate-ping"></span> Live Webhook
+        </span>
+      </div>
+
+      <div class="space-y-2.5" id="order-history-list">
+        <p class="text-xs font-mono text-gray-400 text-center py-4">Sistem siap menerima transaksi baru.</p>
+      </div>
+    </section>
+
+    <!-- KONTAK OWNER -->
+    <section id="view-contact" class="hidden space-y-4">
+      <div class="glass-card p-5 rounded-2xl text-center space-y-4 border border-cyber-neon/30">
+        <div class="relative w-16 h-16 mx-auto">
+          <div class="absolute inset-0 bg-cyber-neon/30 rounded-full blur-md animate-pulse"></div>
+          <div class="relative w-16 h-16 bg-cyber-surface border border-cyber-neon/50 rounded-full flex items-center justify-center text-cyber-neon mx-auto">
+            <i data-lucide="headset" class="w-8 h-8"></i>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-base font-bold text-white">Customer Support & Owner</h3>
+          <p class="text-xs text-gray-400 mt-1">Mengalami kendala deposit, pembelian, atau butuh bantuan integrasi Pakasir?</p>
+        </div>
+        
+        <div class="pt-2 space-y-2.5">
+          <button onclick="contactOwner()" class="w-full bg-gradient-to-r from-cyber-accent to-cyber-neon hover:opacity-90 text-white text-xs font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-cyber-accent/30">
+            <i data-lucide="send" class="w-4 h-4"></i> Chat Direct Owner via Telegram
+          </button>
+          <a href="https://t.me/" target="_blank" class="w-full glass-card block text-gray-300 hover:text-white text-xs font-semibold py-3 rounded-xl transition border border-cyber-border/50">
+            <i data-lucide="users" class="w-3.5 h-3.5 inline mr-1 text-cyber-cyan"></i> Gabung Official Community
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- MODAL TOPUP DEPOSIT -->
+  <div id="topup-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end justify-center sm:items
