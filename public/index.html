@@ -337,4 +337,371 @@
   </div>
 
   <!-- MODAL TOPUP DEPOSIT -->
-  <div id="topup-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end justify-center sm:items
+  <div id="topup-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end justify-center sm:items-center p-0 sm:p-4 transition-all">
+    <div class="bg-cyber-card w-full max-w-md p-5 rounded-t-3xl sm:rounded-2xl border border-cyber-neon/40 space-y-4 animate-in slide-in-from-bottom duration-300 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-cyber-border/60 pb-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="wallet" class="w-5 h-5 text-cyber-neon"></i>
+          <h3 class="text-xs font-mono font-bold text-white uppercase tracking-wider">Isi Saldo Akun</h3>
+        </div>
+        <button onclick="closeTopupModal()" class="text-gray-400 hover:text-white p-1 rounded-lg bg-cyber-surface"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div>
+        <label class="text-[10px] font-mono text-gray-400 block mb-1.5 uppercase">Pilih Nominal Deposit:</label>
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="selectTopupAmount(10000)" class="topup-btn glass-card border border-cyber-border/60 py-2 rounded-xl text-xs font-mono text-white hover:border-cyber-neon transition">Rp 10.000</button>
+          <button onclick="selectTopupAmount(25000)" class="topup-btn glass-card border border-cyber-border/60 py-2 rounded-xl text-xs font-mono text-white hover:border-cyber-neon transition">Rp 25.000</button>
+          <button onclick="selectTopupAmount(50000)" class="topup-btn glass-card border border-cyber-border/60 py-2 rounded-xl text-xs font-mono text-white hover:border-cyber-neon transition">Rp 50.000</button>
+          <button onclick="selectTopupAmount(100000)" class="topup-btn glass-card border border-cyber-border/60 py-2 rounded-xl text-xs font-mono text-white hover:border-cyber-neon transition">Rp 100.000</button>
+          <button onclick="selectTopupAmount(150000)" class="topup-btn glass-card border border-cyber-border/60 py-2 rounded-xl text-xs font-mono text-white hover:border-cyber-neon transition">Rp 150.000</button>
+          <button onclick="selectTopupAmount(200000)" class="topup-btn glass-card border border-cyber-border/60 py-2 rounded-xl text-xs font-mono text-white hover:border-cyber-neon transition">Rp 200.000</button>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-[10px] font-mono text-gray-400 block mb-1 uppercase">Atau Nominal Custom (Rp):</label>
+        <input type="number" id="topup-custom-amount" placeholder="Min. Rp 5.000" class="w-full bg-cyber-surface border border-cyber-border/60 text-xs font-mono text-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-cyber-neon">
+      </div>
+
+      <div class="bg-cyber-bg p-3 rounded-xl border border-cyber-border/60 text-xs space-y-1">
+        <div class="flex justify-between text-gray-400 text-[11px]">
+          <span>Metode Pembayaran:</span>
+          <span class="text-white font-mono font-bold text-cyber-cyan flex items-center gap-1">
+            <i data-lucide="qr-code" class="w-3.5 h-3.5 text-cyber-neon"></i> QRIS Pakasir (Auto)
+          </span>
+        </div>
+      </div>
+
+      <button onclick="processDepositPakasir()" class="w-full bg-gradient-to-r from-cyber-accent to-cyber-neon hover:opacity-90 text-white font-extrabold text-xs py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-cyber-accent/30">
+        <i data-lucide="qr-code" class="w-4 h-4"></i> Generate QRIS Pakasir
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL CHECKOUT PRODUK -->
+  <div id="checkout-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-end justify-center sm:items-center p-0 sm:p-4 transition-all">
+    <div class="bg-cyber-card w-full max-w-md p-5 rounded-t-3xl sm:rounded-2xl border border-cyber-neon/40 space-y-4 animate-in slide-in-from-bottom duration-300 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-cyber-border/60 pb-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="shopping-cart" class="w-5 h-5 text-cyber-emerald"></i>
+          <h3 class="text-xs font-mono font-bold text-white uppercase tracking-wider">Konfirmasi Pembelian</h3>
+        </div>
+        <button onclick="closeCheckout()" class="text-gray-400 hover:text-white p-1 rounded-lg bg-cyber-surface"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div class="bg-cyber-surface/60 p-3.5 rounded-xl border border-cyber-border/40 space-y-1">
+        <span class="text-[10px] font-mono text-gray-400 block uppercase">Produk Dipesan:</span>
+        <h4 id="checkout-item-title" class="text-sm font-bold text-cyber-neon">Product Title</h4>
+        <div class="flex justify-between items-baseline mt-2">
+          <span class="text-xs text-gray-400">Total Tagihan:</span>
+          <span id="checkout-item-price" class="text-base font-mono font-extrabold text-cyber-emerald">Rp 0</span>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label class="text-[10px] font-mono text-gray-400 block uppercase">Pilih Metode Pembayaran:</label>
+
+        <label onclick="selectPaymentMethod('saldo')" id="pay-opt-saldo" class="flex items-center justify-between p-3 rounded-xl border border-cyber-neon bg-cyber-neon/10 cursor-pointer transition">
+          <div class="flex items-center gap-3">
+            <input type="radio" name="payment_method" value="saldo" checked class="accent-cyber-neon">
+            <div>
+              <span class="text-xs font-bold text-white block">Potong Saldo Akun</span>
+              <span id="checkout-balance-info" class="text-[10px] font-mono text-cyber-emerald">Tersedia: Rp 0</span>
+            </div>
+          </div>
+          <i data-lucide="wallet" class="w-4 h-4 text-cyber-neon"></i>
+        </label>
+
+        <label onclick="selectPaymentMethod('qris')" id="pay-opt-qris" class="flex items-center justify-between p-3 rounded-xl border border-cyber-border/60 bg-cyber-surface/40 cursor-pointer transition">
+          <div class="flex items-center gap-3">
+            <input type="radio" name="payment_method" value="qris" class="accent-cyber-neon">
+            <div>
+              <span class="text-xs font-bold text-white block">QRIS Direct (Pakasir)</span>
+              <span class="text-[10px] text-gray-400">Bayar langsung via E-Wallet</span>
+            </div>
+          </div>
+          <i data-lucide="qr-code" class="w-4 h-4 text-cyber-cyan"></i>
+        </label>
+      </div>
+
+      <button onclick="processProductPayment()" id="checkout-btn" class="w-full bg-gradient-to-r from-cyber-emerald to-teal-500 hover:opacity-90 text-black font-extrabold text-xs py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-cyber-emerald/20">
+        <i data-lucide="check-circle" class="w-4 h-4"></i> Konfirmasi & Bayar
+      </button>
+    </div>
+  </div>
+
+  <!-- NAVBAR MOBILE -->
+  <nav class="fixed bottom-0 left-0 right-0 z-30 glass-nav max-w-md mx-auto px-6 py-2.5">
+    <div class="flex justify-between items-center">
+      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center text-cyber-neon transition group">
+        <i data-lucide="layout-dashboard" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+        <span class="text-[9px] font-mono font-semibold mt-1">Home</span>
+      </button>
+      <button onclick="switchTab('products')" id="nav-products" class="flex flex-col items-center text-gray-400 hover:text-white transition group">
+        <i data-lucide="shopping-bag" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+        <span class="text-[9px] font-mono font-semibold mt-1">Katalog</span>
+      </button>
+      <button onclick="switchTab('orders')" id="nav-orders" class="flex flex-col items-center text-gray-400 hover:text-white transition group">
+        <i data-lucide="activity" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+        <span class="text-[9px] font-mono font-semibold mt-1">Orderan</span>
+      </button>
+      <button onclick="switchTab('contact')" id="nav-contact" class="flex flex-col items-center text-gray-400 hover:text-white transition group">
+        <i data-lucide="headset" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+        <span class="text-[9px] font-mono font-semibold mt-1">Kontak</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- SCRIPT LOGIC INTEGRATION -->
+  <script>
+    lucide.createIcons();
+
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      tg.setHeaderColor('#08070e');
+      tg.setBackgroundColor('#08070e');
+    }
+
+    let currentBalance = 0;
+    let selectedPaymentMethod = 'saldo';
+    let currentSelectedItem = null;
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const loadingBar = document.getElementById('loading-bar');
+      setTimeout(() => { loadingBar.style.width = '60%'; }, 200);
+      setTimeout(() => { loadingBar.style.width = '100%'; }, 800);
+
+      if (tg && tg.initDataUnsafe?.user) {
+        const user = tg.initDataUnsafe.user;
+        document.getElementById('user-name').innerText = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+        document.getElementById('user-id').innerText = `ID: ${user.id}`;
+        if (user.photo_url) {
+          document.getElementById('user-avatar').src = user.photo_url;
+        }
+
+        // Ambil Data Saldo Asli dari Backend Server
+        try {
+          const res = await fetch(`/api/user/${user.id}`);
+          const data = await res.json();
+          if (data.status === 'success') {
+            currentBalance = data.data.balance;
+          }
+        } catch (e) {
+          console.error("Gagal mengambil data saldo dari backend:", e);
+        }
+      }
+
+      updateUserBalanceDisplay();
+
+      setTimeout(() => {
+        const loader = document.getElementById('loading-screen');
+        loader.classList.add('opacity-0');
+        setTimeout(() => {
+          loader.classList.add('hidden');
+          document.getElementById('app').classList.remove('hidden');
+        }, 500);
+      }, 1200);
+    });
+
+    function updateUserBalanceDisplay() {
+      document.getElementById('user-balance').innerText = `Rp ${currentBalance.toLocaleString('id-ID')}`;
+      document.getElementById('checkout-balance-info').innerText = `Tersedia: Rp ${currentBalance.toLocaleString('id-ID')}`;
+    }
+
+    function switchTab(tab) {
+      const views = ['dashboard', 'products', 'orders', 'contact'];
+      views.forEach(v => {
+        document.getElementById(`view-${v}`).classList.add('hidden');
+        document.getElementById(`nav-${v}`).classList.remove('text-cyber-neon');
+        document.getElementById(`nav-${v}`).classList.add('text-gray-400');
+      });
+
+      document.getElementById(`view-${tab}`).classList.remove('hidden');
+      document.getElementById(`nav-${tab}`).classList.add('text-cyber-neon');
+      document.getElementById(`nav-${tab}`).classList.remove('text-gray-400');
+    }
+
+    function filterCategory(category) {
+      switchTab('products');
+      const items = document.querySelectorAll('.product-item');
+      items.forEach(item => {
+        item.style.display = (item.getAttribute('data-category') === category) ? 'flex' : 'none';
+      });
+    }
+
+    function resetFilter() {
+      const items = document.querySelectorAll('.product-item');
+      items.forEach(item => item.style.display = 'flex');
+      document.getElementById('search-input').value = '';
+    }
+
+    function filterProducts() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      const items = document.querySelectorAll('.product-item');
+      items.forEach(item => {
+        const name = item.getAttribute('data-name').toLowerCase();
+        item.style.display = name.includes(query) ? 'flex' : 'none';
+      });
+    }
+
+    function openTopupModal() {
+      document.getElementById('topup-modal').classList.remove('hidden');
+      if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+    }
+
+    function closeTopupModal() {
+      document.getElementById('topup-modal').classList.add('hidden');
+    }
+
+    function selectTopupAmount(amount) {
+      document.getElementById('topup-custom-amount').value = amount;
+    }
+
+    async function processDepositPakasir() {
+      const amount = parseInt(document.getElementById('topup-custom-amount').value);
+      if (!amount || amount < 5000) {
+        alert("Nominal minimal deposit adalah Rp 5.000");
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/pakasir/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            telegramId: tg?.initDataUnsafe?.user?.id || '123456789',
+            username: tg?.initDataUnsafe?.user?.username || 'Guest',
+            amount: amount,
+            type: 'DEPOSIT',
+            itemName: 'Topup Saldo DIGIXSHOP'
+          })
+        });
+
+        const resData = await response.json();
+        if (resData.status === 'success') {
+          closeTopupModal();
+          if (tg) {
+            tg.openLink(resData.data.payment_url);
+          } else {
+            window.open(resData.data.payment_url, '_blank');
+          }
+        } else {
+          alert(resData.message || "Gagal membuat invoice Pakasir.");
+        }
+      } catch (err) {
+        alert("Gagal terhubung ke backend server.");
+      }
+    }
+
+    function openCheckout(title, price) {
+      currentSelectedItem = { title, price };
+      document.getElementById('checkout-item-title').innerText = title;
+      document.getElementById('checkout-item-price').innerText = `Rp ${price.toLocaleString('id-ID')}`;
+      selectPaymentMethod('saldo');
+
+      document.getElementById('checkout-modal').classList.remove('hidden');
+      if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+    }
+
+    function closeCheckout() {
+      document.getElementById('checkout-modal').classList.add('hidden');
+    }
+
+    function selectPaymentMethod(method) {
+      selectedPaymentMethod = method;
+      const optSaldo = document.getElementById('pay-opt-saldo');
+      const optQris = document.getElementById('pay-opt-qris');
+
+      if (method === 'saldo') {
+        optSaldo.className = "flex items-center justify-between p-3 rounded-xl border border-cyber-neon bg-cyber-neon/10 cursor-pointer transition";
+        optQris.className = "flex items-center justify-between p-3 rounded-xl border border-cyber-border/60 bg-cyber-surface/40 cursor-pointer transition";
+        optSaldo.querySelector('input').checked = true;
+      } else {
+        optQris.className = "flex items-center justify-between p-3 rounded-xl border border-cyber-cyan bg-cyber-cyan/10 cursor-pointer transition";
+        optSaldo.className = "flex items-center justify-between p-3 rounded-xl border border-cyber-border/60 bg-cyber-surface/40 cursor-pointer transition";
+        optQris.querySelector('input').checked = true;
+      }
+    }
+
+    async function processProductPayment() {
+      if (!currentSelectedItem) return;
+
+      if (selectedPaymentMethod === 'saldo') {
+        if (currentBalance < currentSelectedItem.price) {
+          alert("Saldo Anda tidak mencukupi. Silakan isi saldo terlebih dahulu.");
+          closeCheckout();
+          openTopupModal();
+          return;
+        }
+
+        try {
+          const response = await fetch('/api/buy-with-balance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              telegramId: tg?.initDataUnsafe?.user?.id || '123456789',
+              username: tg?.initDataUnsafe?.user?.username || 'Guest',
+              itemName: currentSelectedItem.title,
+              price: currentSelectedItem.price
+            })
+          });
+
+          const resData = await response.json();
+          if (resData.status === 'success') {
+            currentBalance = resData.data.remaining_balance;
+            updateUserBalanceDisplay();
+            alert(`Pembayaran Berhasil!\n\nItem: ${currentSelectedItem.title}`);
+            closeCheckout();
+            switchTab('orders');
+          } else {
+            alert(resData.message || "Gagal memproses transaksi.");
+          }
+        } catch (err) {
+          alert("Terjadi kesalahan sistem saat memotong saldo.");
+        }
+      } else {
+        // Direct QRIS Pakasir
+        try {
+          const response = await fetch('/api/pakasir/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              telegramId: tg?.initDataUnsafe?.user?.id || '123456789',
+              username: tg?.initDataUnsafe?.user?.username || 'Guest',
+              amount: currentSelectedItem.price,
+              type: 'DIRECT_BUY',
+              itemName: currentSelectedItem.title
+            })
+          });
+
+          const resData = await response.json();
+          if (resData.status === 'success') {
+            closeCheckout();
+            if (tg) {
+              tg.openLink(resData.data.payment_url);
+            } else {
+              window.open(resData.data.payment_url, '_blank');
+            }
+          }
+        } catch (err) {
+          alert("Gagal membuat invoice transaksi Direct QRIS.");
+        }
+      }
+    }
+
+    function contactOwner() {
+      fetch('/api/config/owner').then(res => res.json()).then(data => {
+        const ownerUsername = data.owner_username || "owner_username";
+        if (tg) {
+          tg.openTelegramLink(`https://t.me/${ownerUsername}`);
+        } else {
+          window.open(`https://t.me/${ownerUsername}`, '_blank');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
