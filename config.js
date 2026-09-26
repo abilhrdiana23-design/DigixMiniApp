@@ -4,5 +4,5 @@ module.exports = {
   OWNER_USERNAME: "meowye2",                                     // Username Telegram (tanpa @)
   PAKASIR_API_KEY: "IaWKsXm685jNgbQrGKhLGzeajA0bFZKc",
   PAKASIR_MERCHANT_ID: "digix-shop",
-  WEBAPP_URL: "https://miniapp-n6nxv0cpy-abilhrdiana23-designs-projects.vercel.app/"                  // Nanti diisi URL dari Vercel
+  WEBAPP_URL: "https://digix-mini-app.vercel.app/"                  // Nanti diisi URL dari Vercel
 };
