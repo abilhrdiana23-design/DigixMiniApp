@@ -1,0 +1,13 @@
+{
+  "name": "digixshop-miniapp",
+  "version": "1.0.0",
+  "description": "DIGIXSHOP Telegram MiniApp Serverless",
+  "main": "api/index.js",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "node-telegram-bot-api": "^0.64.0"
+  }
+}
